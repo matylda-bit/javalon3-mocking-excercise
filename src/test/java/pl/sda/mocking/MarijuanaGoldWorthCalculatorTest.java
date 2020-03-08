@@ -4,27 +4,37 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class MarijuanaGoldWorthCalculatorTest {
     @Test
-    void should() {
+    void shouldTestHappyPath() {
         //given
-        MarijuanaGoldWorthCalculator marijuanaGoldWorthCalculator = new MarijuanaGoldWorthCalculator(() -> new BigDecimal("205.32"));
+        GoldPriceRetriever mockRetriever = mock(GoldPriceRetriever.class);
+        when(mockRetriever.fetchGoldPrice()).thenReturn(new BigDecimal("205.32"));
+
+        MarijuanaGoldWorthCalculator marijuanaGoldWorthCalculator = new MarijuanaGoldWorthCalculator(mockRetriever);
         //when
         BigDecimal actual = marijuanaGoldWorthCalculator.ouncesPerGoldKilo();
         //then
         BigDecimal expected = new BigDecimal("0.83");
         assertEquals(expected, actual);
     }
-    class FakeGoldPriceRetriever implements GoldPriceRetriever{
 
-        @Override
-        public BigDecimal fetchGoldPrice() {
-            return new BigDecimal("205.32");
-        }
+    @Test
+    void shouldTestFreeGold() {
+        //given
+        GoldPriceRetriever mockRetriever = mock(GoldPriceRetriever.class);
+        when(mockRetriever.fetchGoldPrice()).thenReturn(BigDecimal.ZERO);
 
-
+        MarijuanaGoldWorthCalculator marijuanaGoldWorthCalculator = new MarijuanaGoldWorthCalculator(mockRetriever);
+        //when
+        BigDecimal actual = marijuanaGoldWorthCalculator.ouncesPerGoldKilo();
+        //then
+        BigDecimal expected = BigDecimal.ZERO;
+        assertEquals(expected, actual);
     }
 
 }
