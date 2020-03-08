@@ -3,9 +3,7 @@ package pl.sda.mocking;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.IOException;
@@ -15,8 +13,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-@NoArgsConstructor
-@AllArgsConstructor
 public class GoldPriceRetriever {
     private static final URI NBP_URI = java.net.URI.create("http://api.nbp.pl/api/cenyzlota/");
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -27,7 +23,8 @@ public class GoldPriceRetriever {
             HttpResponse<String> response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
             PriceResponse[] priceResponses = OBJECT_MAPPER.readValue(response.body(), PriceResponse[].class);
             return priceResponses[0].getPrice();
-        } catch (IOException | InterruptedException ignore) {
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
             return BigDecimal.ZERO;
         }
     }
@@ -36,7 +33,7 @@ public class GoldPriceRetriever {
     @JsonIgnoreProperties(ignoreUnknown = true)
     @Getter
     @Setter
-    private class PriceResponse {
+    private static class PriceResponse {
         @JsonProperty("cena")
         private BigDecimal price;
     }
